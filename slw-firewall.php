@@ -270,13 +270,28 @@ function WP_firewall_check_whitelisted_variable(){
 	return $new_arr;
 }
 
+function GetIP(){
+    if(getenv("HTTP_CLIENT_IP")) {
+         $ip = getenv("HTTP_CLIENT_IP");
+     } elseif(getenv("HTTP_X_FORWARDED_FOR")) {
+         $ip = getenv("HTTP_X_FORWARDED_FOR");
+         if (strstr($ip, ',')) {
+             $tmp = explode (',', $ip);
+             $ip = trim($tmp[0]);
+         }
+     } else {
+     $ip = getenv("REMOTE_ADDR");
+     }
+    return $ip;
+}
+
 function WP_firewall_send_log_message($bad_variable = '',
 $bad_value = '', $attack_type = '', $attack_category = ''){
 	
 	$bad_variable = htmlentities($bad_variable);
 	$bad_value = htmlentities($bad_value);
 	
-	$offender_ip = $_SERVER['REMOTE_ADDR'] ;
+	$offender_ip = GetIP();
 
 	$limit_check = (
 	get_option('WP_firewall_email_limit') == 'on' 
@@ -313,13 +328,13 @@ $bad_value = '', $attack_type = '', $attack_category = ''){
 		<tr>
 		<td align="right"><b>Web sayfası:&nbsp;&nbsp;</b></td>
 		<td>$offending_url <br />
-		<small>Uyarı: & nbsp; URL tehlikeli içeriğe sahip olabilir!</small>
+		<small>Uyarı: &nbsp; URL tehlikeli içeriğe sahip olabilir!</small>
 		</td>
 		</tr>
 		<tr>
 		<td align="right"><b>Soruna neden olan IP:&nbsp;&nbsp;</b></td>
 		<td>$offender_ip
-	<a href="http://www.iplocation.net/ $offender_ip">
+	<a href="http://whatismyipaddress.com/ip/$offender_ip">
 		[ İp Lokasyonuna bakın ]
 		</a>
 		</td>
