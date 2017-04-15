@@ -308,9 +308,8 @@ $bad_value = '', $attack_type = '', $attack_category = ''){
 		'&suppress=0">Tıkla</a> ve bastır.'
 		: '';
 		
-		
 		$offending_url = $_SERVER['HTTP_HOST'] .$_SERVER['REQUEST_URI'] ;
-		
+		$referrerUri = (!empty($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '';
 		
 		$variable_explain_url   = 
 		'http://alicomez.com/slw-firewall.slw'
@@ -327,7 +326,12 @@ $bad_value = '', $attack_type = '', $attack_category = ''){
 		<table border="0" cellpadding="5">
 		<tr>
 		<td align="right"><b>Web sayfası:&nbsp;&nbsp;</b></td>
-		<td>$offending_url <br />
+		<td>$offending_url
+		</td>
+		</tr>
+		<tr>
+		<td align="right"><b>Kaynak:&nbsp;&nbsp;</b></td>
+		<td>$referrerUri <br />
 		<small>Uyarı: &nbsp; URL tehlikeli içeriğe sahip olabilir!</small>
 		</td>
 		</tr>
