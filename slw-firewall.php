@@ -123,6 +123,8 @@ function WP_firewall_check_exclusions () {
 	$hostnames[] = 'yandex';
 	$hostnames[] = 'googlebot';
 	$hostnames[] = 'bing';
+	$hostnames[] = 'yahoo';
+
 
 	$request_string = WP_firewall_check_whitelisted_variable();
 	if($request_string == false){
