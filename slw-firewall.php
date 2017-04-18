@@ -91,9 +91,38 @@ add_option('WP_firewall_previous_attack_var', '');
 add_option('WP_firewall_previous_attack_ip', '');
 add_option('WP_firewall_email_limit', 'off');
 
+function contai($string, $array) {
+    $respons = false;
+    foreach($array as $value) {
+        if (false !== stripos($string, $value)) {
+            $respons = true;
+        };
+    }
+    return $respons;
+}
+
+function GetIP(){
+    if(getenv("HTTP_CLIENT_IP")) {
+         $ip = getenv("HTTP_CLIENT_IP");
+     } elseif(getenv("HTTP_X_FORWARDED_FOR")) {
+         $ip = getenv("HTTP_X_FORWARDED_FOR");
+         if (strstr($ip, ',')) {
+             $tmp = explode (',', $ip);
+             $ip = trim($tmp[0]);
+         }
+     } else {
+     $ip = getenv("REMOTE_ADDR");
+     }
+    return $ip;
+}
+
 WP_firewall_check_exclusions ();
 
 function WP_firewall_check_exclusions () {
+	$hostnames = array();
+	$hostnames[] = 'yandex';
+	$hostnames[] = 'googlebot';
+	$hostnames[] = 'bing';
 
 	$request_string = WP_firewall_check_whitelisted_variable();
 	if($request_string == false){
@@ -181,10 +210,13 @@ function WP_firewall_check_exclusions () {
 			
 				foreach($request_string as $key=>$value){				
 					if(preg_match($preg, $value)){
-						if(!WP_firewall_check_ip_whitelist()){				
-							WP_firewall_send_log_message($key, $value, 
-							'remote-file-execution-attack', 'Remote File Execution');
-							WP_firewall_send_redirect();
+						if(!WP_firewall_check_ip_whitelist()){
+							$hostname = gethostbyaddr(GetIP());
+							if (!contai($hostname, $hostnames)) {
+								WP_firewall_send_log_message($key, $value, 
+								'remote-file-execution-attack', 'Remote File Execution');
+								WP_firewall_send_redirect();
+							}
 						}		
 					}
 				}
@@ -268,21 +300,6 @@ function WP_firewall_check_whitelisted_variable(){
 		$count++;
 	}					
 	return $new_arr;
-}
-
-function GetIP(){
-    if(getenv("HTTP_CLIENT_IP")) {
-         $ip = getenv("HTTP_CLIENT_IP");
-     } elseif(getenv("HTTP_X_FORWARDED_FOR")) {
-         $ip = getenv("HTTP_X_FORWARDED_FOR");
-         if (strstr($ip, ',')) {
-             $tmp = explode (',', $ip);
-             $ip = trim($tmp[0]);
-         }
-     } else {
-     $ip = getenv("REMOTE_ADDR");
-     }
-    return $ip;
 }
 
 function WP_firewall_send_log_message($bad_variable = '',
